@@ -6,8 +6,8 @@ import (
 	"github.com/go-redis/redis"
 )
 
-func AddTodoHandler(c *redis.Client) func (w http.ResponseWriter, r *http.Request) {
-	return func (w http.ResponseWriter, r *http.Request) {
+func AddTodoHandler(c *redis.Client) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
 		todo := UnmarshallBody(r)
@@ -21,7 +21,7 @@ func AddTodoHandler(c *redis.Client) func (w http.ResponseWriter, r *http.Reques
 
 		defer r.Body.Close()
 
-		err = c.Set(todo.Id, todo.Content, 0).Err()
+		err = c.LPush("todos", todo.Content).Err()
 		if (err != nil) {
 			panic(err)
 		}
