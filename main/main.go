@@ -18,6 +18,8 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", api.IndexTodoHandler).
 			      Methods("GET")
+	r.HandleFunc("/todo", api.GetTodosHandler(&client)).
+			      Methods("GET")
 	r.HandleFunc("/todo/{id}", api.GetTodoHandler(&client)).
 		              Methods("GET")
 	r.HandleFunc("/todo", api.AddTodoHandler(&client)).
