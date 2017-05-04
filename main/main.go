@@ -24,7 +24,7 @@ func main() {
 	r.HandleFunc("/", api.IndexTodoHandler).
 			      Methods("GET")
 	r.HandleFunc("/todo/", api.GetTodoHandler(&client)).
-		              Methods("GET")   //{content}
+		              Methods("GET")
 	r.HandleFunc("/todo", api.AddTodoHandler(&client)).
 		              Methods("POST")
 	r.HandleFunc("/todo", api.EditTodoHandler).
