@@ -2,53 +2,64 @@ package api
 
 import (
 	"net/http"
-	"github.com/gorilla/mux"
 	"fmt"
 	"encoding/json"
 	"github.com/go-redis/redis"
+	"strings"
 )
 
-func todoErrorHandler(w http.ResponseWriter, r *http.Request, status int, id string) {
+func todoErrorHandler(w http.ResponseWriter, r *http.Request, status int, content string) {
 	w.WriteHeader(status)
 	if (status == http.StatusNotFound) {
-		fmt.Fprint(w, "Cannot find " + id)
+		fmt.Fprint(w, "Cannot find todo :" + content)
 	} else if( status == http.StatusInternalServerError){
-		fmt.Fprint(w, "Something went wrong while managing " + id)
+		fmt.Fprint(w, "Something went wrong while managing : " + content)
 	} else if(status == http.StatusBadRequest ){
-		fmt.Fprint(w, "Not able to extract id " + id)
+		fmt.Fprint(w, "Not able to extract content : " + content)
 	} else if(status == http.StatusProcessing){
-		fmt.Fprint(w, "Unable to marshal/unmarshal for todo " + id)
+		fmt.Fprint(w, "Unable to marshal/unmarshal for todo : " + content)
 	}
 }
 
 func GetTodoHandler(c *redis.Client) func (w http.ResponseWriter, r *http.Request) {
      return func (w http.ResponseWriter, r *http.Request) {
-	     vars := mux.Vars(r)
-	     id, ok := vars["id"]
-	     if (!ok) {
-		     todoErrorHandler(w, r, http.StatusBadRequest, id)
+	     content := r.URL.Query().Get("content")
+	     if (len(content) == 0) {
+		     todoErrorHandler(w, r, http.StatusBadRequest, content)
 		     return
 	     }
 
-	     val, err := c.Get(id).Result()
-	     if (err == redis.Nil) {
-		     todoErrorHandler(w, r, http.StatusNotFound, id)
+	     todos, err := c.LRange("todos", 0, -1).Result()
+	     if (err == redis.Nil || len(todos) == 0) {
+		     todoErrorHandler(w, r, http.StatusNotFound, content)
 		     return
 	     } else if (err != nil) {
-		     todoErrorHandler(w, r, http.StatusProcessing, id)
+		     todoErrorHandler(w, r, http.StatusProcessing, content)
 		     return
 	     }
 
-	     m, err := json.Marshal(Todo{id, val})
+	     var val string
+	     for _, k := range todos {
+		          if(strings.Contains(k, content)){
+				val = k
+			  }
+	     }
+
+	     if(len(val) == 0){
+		     todoErrorHandler(w, r, http.StatusNotFound, content)
+		     return
+	     }
+
+	     m, err := json.Marshal(Todo{val})
 	     if (err != nil) {
-		     todoErrorHandler(w, r, http.StatusProcessing, id)
+		     todoErrorHandler(w, r, http.StatusProcessing, content)
 		     return
 	     }
 
 	     res := Response{"Ok", string(m)}
 	     response, err := json.Marshal(res)
 	     if err != nil {
-		     todoErrorHandler(w, r, http.StatusProcessing, id)
+		     todoErrorHandler(w, r, http.StatusProcessing, content)
 		     return
 	     }
 

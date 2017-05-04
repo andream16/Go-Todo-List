@@ -3,9 +3,10 @@ package redismanager
 import (
 	"fmt"
 	"github.com/go-redis/redis"
+	"errors"
 )
 
-func InitRedisClient() redis.Client {
+func InitRedisClient() (redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr    : "localhost:6379",
 		Password: "",
@@ -14,9 +15,9 @@ func InitRedisClient() redis.Client {
 
 	pong, err := client.Ping().Result()
 	if( err != nil ){
-		fmt.Println("Cannot Initialize Redis Client ", err)
+		return *client, errors.New("Cannot Initialize Redis Client : " + err.Error())
 	}
 	fmt.Println("Redis Client Successfully Initialized . . .", pong)
 
-	return *client
+	return *client, err
 }

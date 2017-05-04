@@ -7,21 +7,24 @@ import (
 	"log"
 	"../redismanager"
 	"../api"
+	"os"
 )
 
 func main() {
 
 	//Initialize Redis Client
-	client := redismanager.InitRedisClient()
+	client, err := redismanager.InitRedisClient()
+	if(err != nil){
+		log.Fatalf(err.Error())
+		os.Exit(1)
+	}
 
 	//Initialize Router Handlers
 	r := mux.NewRouter()
 	r.HandleFunc("/", api.IndexTodoHandler).
 			      Methods("GET")
-	r.HandleFunc("/todo", api.GetTodosHandler(&client)).
-			      Methods("GET")
-	r.HandleFunc("/todo/{id}", api.GetTodoHandler(&client)).
-		              Methods("GET")
+	r.HandleFunc("/todo/", api.GetTodoHandler(&client)).
+		              Methods("GET")   //{content}
 	r.HandleFunc("/todo", api.AddTodoHandler(&client)).
 		              Methods("POST")
 	r.HandleFunc("/todo", api.EditTodoHandler).
