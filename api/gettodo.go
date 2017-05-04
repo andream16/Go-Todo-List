@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"github.com/go-redis/redis"
 	"strings"
-	"strconv"
+	"bytes"
 )
 
 func todoErrorHandler(w http.ResponseWriter, r *http.Request, status int, content string) {
@@ -42,11 +42,13 @@ func GetTodoHandler(c *redis.Client) func(w http.ResponseWriter, r *http.Request
 		var val string
 		for _, k := range todos {
 			if (strings.Contains(k, content)) {
-				val = k
+				tmp, _ := json.Marshal(Todo{k})
+				val = string(tmp)
 			}
 		}
 
-		var m, parsedTodos []byte
+		var response []byte
+		var parsedTodos []string
 
 		if (len(val) == 0) {
 			for _, cont := range todos {
@@ -55,28 +57,20 @@ func GetTodoHandler(c *redis.Client) func(w http.ResponseWriter, r *http.Request
 					todoErrorHandler(w, r, http.StatusProcessing, content)
 					return
 				}
-				parsedTodos = append(parsedTodos, currTodo...)
-			}
-			m, err = json.Marshal(string(parsedTodos))
-			if (err != nil) {
-				todoErrorHandler(w, r, http.StatusProcessing, content)
-				return
-			}
-		} else {
-
-			m, err = json.Marshal(Todo{val})
-			if (err != nil) {
-				todoErrorHandler(w, r, http.StatusProcessing, content)
-				return
+				currParsedTodo := string(currTodo)
+				parsedTodos  = append(parsedTodos, currParsedTodo)
 			}
 		}
 
-		res := Response{"Ok", string(m)}
-		response, err := json.Marshal(res)
-		if err != nil {
-			todoErrorHandler(w, r, http.StatusProcessing, content)
-			return
+		if(len(val) > 0){
+			res := Response{"Ok", val}
+			response, _ = json.Marshal(res)
+		} else if(len(parsedTodos) > 0){
+			res := SliceResponse{"Ok", parsedTodos}
+			response, _ = json.Marshal(res)
 		}
+
+		response = bytes.Replace(response, []byte("\\"), []byte(""), -1)
 
 		defer r.Body.Close()
 

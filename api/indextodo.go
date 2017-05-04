@@ -9,6 +9,11 @@ type Todo struct {
 	Content string `json:"Content"`
 }
 
+type SliceResponse struct {
+	Status string
+	Description []string
+}
+
 type Response struct {
 	Status string
 	Description string
