@@ -42,7 +42,7 @@ func GetTodoHandler(c *redis.Client) func(w http.ResponseWriter, r *http.Request
 		var val string
 		for _, k := range todos {
 			if (strings.Contains(k, content)) {
-				tmp, _ := json.Marshal(Todo{k})
+				tmp, _ := json.Marshal(k)
 				val = string(tmp)
 			}
 		}
@@ -52,7 +52,7 @@ func GetTodoHandler(c *redis.Client) func(w http.ResponseWriter, r *http.Request
 
 		if (len(val) == 0) {
 			for _, cont := range todos {
-				currTodo, err := json.Marshal(Todo{cont})
+				currTodo, err := json.Marshal(cont)
 				if(err != nil) {
 					todoErrorHandler(w, r, http.StatusProcessing, content)
 					return

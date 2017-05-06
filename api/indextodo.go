@@ -11,12 +11,12 @@ type Todo struct {
 
 type SliceResponse struct {
 	Status string
-	Description []string
+	Data []string
 }
 
 type Response struct {
 	Status string
-	Description string
+	Data string
 }
 
 func IndexTodoHandler(w http.ResponseWriter, r *http.Request) {
