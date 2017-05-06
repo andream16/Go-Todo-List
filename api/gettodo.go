@@ -3,10 +3,10 @@ package api
 import (
 	"net/http"
 	"fmt"
-	"encoding/json"
 	"github.com/go-redis/redis"
-	"strings"
 	"bytes"
+	"strings"
+	"encoding/json"
 )
 
 func todoErrorHandler(w http.ResponseWriter, r *http.Request, status int, content string) {
@@ -24,11 +24,8 @@ func todoErrorHandler(w http.ResponseWriter, r *http.Request, status int, conten
 
 func GetTodoHandler(c *redis.Client) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		content := r.URL.Query().Get("content")
-		if (len(content) == 0) {
-			todoErrorHandler(w, r, http.StatusBadRequest, content)
-			return
-		}
 
 		todos, err := c.LRange("todos", 0, -1).Result()
 		if (err == redis.Nil || len(todos) == 0) {
@@ -39,34 +36,29 @@ func GetTodoHandler(c *redis.Client) func(w http.ResponseWriter, r *http.Request
 			return
 		}
 
-		var val string
-		for _, k := range todos {
-			if (strings.Contains(k, content)) {
-				tmp, _ := json.Marshal(k)
-				val = string(tmp)
+		var parsedTodos []string
+		if(len(content) > 0){
+			for _, k := range todos {
+				if (strings.Contains(k, content)) {
+					parsedTodos = append(parsedTodos,k)
+				}
+			}
+		} else {
+			for _, k := range todos {
+					parsedTodos = append(parsedTodos,k)
 			}
 		}
+		
 
 		var response []byte
-		var parsedTodos []string
+		res := SliceResponse{"Ok", parsedTodos}
+		response, _ = json.Marshal(res)
 
-		if (len(val) == 0) {
-			for _, cont := range todos {
-				currTodo, err := json.Marshal(cont)
-				if(err != nil) {
-					todoErrorHandler(w, r, http.StatusProcessing, content)
-					return
-				}
-				currParsedTodo := string(currTodo)
-				parsedTodos  = append(parsedTodos, currParsedTodo)
-			}
-		}
-
-		if(len(val) > 0){
-			res := Response{"Ok", val}
-			response, _ = json.Marshal(res)
-		} else if(len(parsedTodos) > 0){
+		if(len(parsedTodos) > 0){
 			res := SliceResponse{"Ok", parsedTodos}
+			response, _ = json.Marshal(res)
+		} else {
+			res := SliceResponse{"Err", parsedTodos}
 			response, _ = json.Marshal(res)
 		}
 
