@@ -46,15 +46,14 @@ func AddTodoHandler(c *redis.Client) func(w http.ResponseWriter, r *http.Request
 			log.Fatalf("Something went wrong while marshalling m: " + err.Error())
 			return
 		}
-		s, _ := strconv.Unquote(string(t))
 		
-		err = c.LPush("todos", s).Err()
+		err = c.LPush("todos", string(t)).Err()
 		if(err != nil){
-			log.Fatalf("Something went while pushing a new todo " + s +" to todos:" + err.Error())
+			log.Fatalf("Something went while pushing a new todo " + string(t) +" to todos:" + err.Error())
 			return
 		}
 
-		res := Response{"Ok", "Successfully posted a new todo for id: " + s}
+		res := Response{"Ok", "Successfully posted a new todo for id: " + uid}
 		response, err := json.Marshal(res)
 
 		if err != nil {
