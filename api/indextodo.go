@@ -6,12 +6,13 @@ import (
 )
 
 type Todo struct {
+	Id      string `json:"Id"`
 	Content string `json:"Content"`
 }
 
 type SliceResponse struct {
 	Status string
-	Data []string
+	Data []*Todo
 }
 
 type Response struct {
