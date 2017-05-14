@@ -26,8 +26,6 @@ func GetTodoHandler(c *redis.Client) func(w http.ResponseWriter, r *http.Request
 
 		content := r.URL.Query().Get("content")
 
-		fmt.Println(content)
-
 		todos, err := c.LRange("todos", 0, -1).Result()
 
 		if (err == redis.Nil || len(todos) == 0) {
@@ -45,19 +43,11 @@ func GetTodoHandler(c *redis.Client) func(w http.ResponseWriter, r *http.Request
 			for _, d := range todos {
 				todo := &Todo{}
 				json.Unmarshal([]byte(d), todo)
-				if(strings.Contains(todo.Content, content)){
+				if(strings.Contains(todo.Content, content) || len(content) == 0){
 					res.Data = append(res.Data, todo)
 				}
 			}
 			response, _ = json.Marshal(res)
-		} else if(len(todos) > 0){
-			for _, d := range todos {
-				todo := &Todo{}
-				json.Unmarshal([]byte(d), todo)
-				res.Data = append(res.Data, todo)
-			}
-			response, _ = json.Marshal(res)
-			
 		} else {
 			todoErrorHandler(w, r, http.StatusNotFound, content)
 			return
