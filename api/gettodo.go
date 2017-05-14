@@ -24,34 +24,29 @@ func todoErrorHandler(w http.ResponseWriter, r *http.Request, status int, conten
 func GetTodoHandler(c *redis.Client) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		content := r.URL.Query().Get("content")
+		id := r.URL.Query().Get("id")
 
 		todos, err := c.LRange("todos", 0, -1).Result()
 
 		if (err == redis.Nil || len(todos) == 0) {
-			todoErrorHandler(w, r, http.StatusNotFound, content)
+			todoErrorHandler(w, r, http.StatusNotFound, id)
 			return
 		} else if (err != nil) {
-			todoErrorHandler(w, r, http.StatusProcessing, content)
+			todoErrorHandler(w, r, http.StatusProcessing, id)
 			return
 		}
 
 		var response []byte
 		res := &SliceResponse{Status: "Ok"}
 
-		if(len(content) > 0){
-			for _, d := range todos {
-				todo := &Todo{}
-				json.Unmarshal([]byte(d), todo)
-				if(strings.Contains(todo.Content, content) || len(content) == 0){
-					res.Data = append(res.Data, todo)
-				}
+		for _, d := range todos {
+			todo := &Todo{}
+			json.Unmarshal([]byte(d), todo)
+			if (strings.EqualFold(todo.Id, id) || len(id) == 0) {
+				res.Data = append(res.Data, todo)
 			}
-			response, _ = json.Marshal(res)
-		} else {
-			todoErrorHandler(w, r, http.StatusNotFound, content)
-			return
 		}
+		response, _ = json.Marshal(res)
 
 		defer r.Body.Close()
 
