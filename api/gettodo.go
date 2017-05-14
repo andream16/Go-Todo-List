@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-redis/redis"
 	"encoding/json"
+	"strings"
 )
 
 func todoErrorHandler(w http.ResponseWriter, r *http.Request, status int, content string) {
@@ -25,6 +26,8 @@ func GetTodoHandler(c *redis.Client) func(w http.ResponseWriter, r *http.Request
 
 		content := r.URL.Query().Get("content")
 
+		fmt.Println(content)
+
 		todos, err := c.LRange("todos", 0, -1).Result()
 
 		if (err == redis.Nil || len(todos) == 0) {
@@ -36,9 +39,18 @@ func GetTodoHandler(c *redis.Client) func(w http.ResponseWriter, r *http.Request
 		}
 
 		var response []byte
+		res := &SliceResponse{Status: "Ok"}
 
-		if(len(todos) > 0){
-			res := &SliceResponse{Status: "Ok"}
+		if(len(content) > 0){
+			for _, d := range todos {
+				todo := &Todo{}
+				json.Unmarshal([]byte(d), todo)
+				if(strings.Contains(todo.Content, content)){
+					res.Data = append(res.Data, todo)
+				}
+			}
+			response, _ = json.Marshal(res)
+		} else if(len(todos) > 0){
 			for _, d := range todos {
 				todo := &Todo{}
 				json.Unmarshal([]byte(d), todo)
