@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"../redismanager"
+	"../cassandramanager"
 	"../api"
 	"os"
 )
@@ -19,6 +20,16 @@ func main() {
 		os.Exit(1)
 	}
 
+	cluster, err := cassandramanager.InitCassandraCluster()
+	if(err != nil){
+		log.Fatalf(err.Error())
+		os.Exit(1)
+	} else {
+		fmt.Println("Cassandra Cluster Successfully Initialized . . .")
+	}
+
+	fmt.Println(cluster)
+
 	//Initialize Router Handlers
 	r := mux.NewRouter()
 	r.HandleFunc("/", api.IndexTodoHandler).
@@ -29,7 +40,7 @@ func main() {
 		              Methods("POST")
 	r.HandleFunc("/todo/", api.EditTodoHandler(&client)).
 		              Methods("PUT")
-	r.HandleFunc("/todo", api.DeleteTodoHandler).
+	r.HandleFunc("/todo/", api.DeleteTodoHandler(&client)).
 		              Methods("DELETE")
 	http.Handle("/", r)
 
