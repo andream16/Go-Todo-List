@@ -1,7 +1,6 @@
 package redismanager
 
 import (
-	"fmt"
 	"github.com/go-redis/redis"
 	"errors"
 )
@@ -13,11 +12,10 @@ func InitRedisClient() (redis.Client, error) {
 		DB      : 0, //default
 	})
 
-	pong, err := client.Ping().Result()
+	_, err := client.Ping().Result()
 	if( err != nil ){
 		return *client, errors.New("Cannot Initialize Redis Client : " + err.Error())
 	}
-	fmt.Println("Redis Client Successfully Initialized . . .", pong)
 
 	return *client, err
 }
