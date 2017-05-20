@@ -5,6 +5,7 @@ A simple RESTful application built with [go](https://github.com/golang), [gorill
 # What you need to run it
 
  - [go1.8](https://golang.org/doc/devel/release.html#go1.8)
+ - [redis3.1](https://redis.io/download)
  - [gorilla/mux](https://github.com/gorilla/mux). You can get it using `go get -u github.com/gorilla/mux` inside your `$GOPATH`
  - [go-redis](https://github.com/go-redis/redis). You can get it using `go get -u github.com/go-redis/redis`
 
