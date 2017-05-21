@@ -16,10 +16,14 @@ A simple RESTful application built with [go](https://github.com/golang), [gorill
 
 # What you can Actually do
 
- - Get all todos : `curl -H "Content-Type: application/json" -X GET http://localhost:8080`
- - Get one todo  : `curl -H "Content-Type: application/json" -X GET -d '{"id":"1"}' http://localhost:8080`
- - Add a new todo: `curl -H "Content-Type: application/json" -X POST -d '{"content":"Have some Nugs"}' http://localhost:8080`
- - Edit a todo   : `curl -H "Content-Type: application/json" -X PUT -d '{"id":"1", "content":"New Content"}' http://localhost:8080`
- - Delete a todo : `curl -H "Content-Type: application/json" -X DELETE -d '{"id":"1"}' http://localhost:8080`
+ - Get all todos : `curl -H "Content-Type: application/json" -X GET http://localhost:8000`
+ - Get one todo  : `curl -H "Content-Type: application/json" -X GET -d '{"id":"1"}' http://localhost:8000`
+ - Add a new todo: `curl -H "Content-Type: application/json" -X POST -d '{"content":"Have some Nugs"}' http://localhost:8000`
+ - Edit a todo   : `curl -H "Content-Type: application/json" -X PUT -d '{"id":"1", "content":"New Content"}' http://localhost:8000`
+ - Delete a todo : `curl -H "Content-Type: application/json" -X DELETE -d '{"id":"1"}' http://localhost:8000`
  
- Swagger reference available [here](https://app.swaggerhub.com/apis/AndreaM16/Go-Todo-List/1.0.0). 
+Swagger reference available [here](https://app.swaggerhub.com/apis/AndreaM16/Go-Todo-List/1.0.0). 
+ 
+ # Tests?
+ 
+ Sure thing. Run tests using `go test./...` to run all the tests in each folder. A test comes like `nameOfTheTest_test.go`.
