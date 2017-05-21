@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"../redismanager"
-	"../cassandramanager"
 	"../api"
 	"os"
 )
@@ -21,16 +20,6 @@ func main() {
 	} else {
 		fmt.Println("Redis Client Successfully Initialized . . .")
 	}
-
-	cluster, err := cassandramanager.InitCassandraCluster()
-	if(err != nil){
-		log.Fatalf(err.Error())
-		os.Exit(1)
-	} else {
-		fmt.Println("Cassandra Cluster Successfully Initialized . . .")
-	}
-
-	fmt.Println(cluster)
 
 	//Initialize Router Handlers
 	r := mux.NewRouter()
