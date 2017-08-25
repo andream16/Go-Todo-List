@@ -1,4 +1,6 @@
-# Go-Todo-List
+# Go-Todo-List 
+
+<img src='https://bettercodehub.com/edge/badge/AndreaM16/Go-Todo-List?branch=master'>
 
 A simple RESTful application built with [go](https://github.com/golang), [gorilla/mux](https://github.com/gorilla/mux) and [go-redis](https://github.com/go-redis/redis).
 
